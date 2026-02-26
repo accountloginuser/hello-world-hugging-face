@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>Frontend Space</title>
+		<link rel="stylesheet" href="style.css" />
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	</head>
+	<body>
+		<div class="card">
+			<h1>Sentiment Analysis Test 1</h1>
+            <p><i>Demo</i> to test <a href="https://huggingface.co/blog/sentiment-analysis-python" target="_blank">code</a>.</p>
+            <p>Cycle for execution: Use base model for handling text, then tune it to aim for sentiment analysis, then use it to test.</p>
+            <hr width="100%" />
+			<p>Frontend space <i>index.html</i> form submit input to backend. Check browser console for debug.</p>
+			<p>Backend space hosts <i>app.py</i> with Docker to process input. Check log to see running status.</p>
+			<p>Note: Generate access token for writing the tuned model if not already generated.</p>
+            <p>Note: Declare some imported libraries in <i>app.py</i> to be also included in <i>requirements.txt</i> for building.</p>
+          	<p>Note: For training with CPU, try use smaller dataset split sampling size for faster testing.</p>
+		</div>
+      <form id="id_form">
+        <br/><input type="text" placeholder="... Input text ..." id="id_text" />
+        <br/><input type="text" placeholder="... Access token ..." id="id_accesstoken" />
+        <br/><input type="submit" value="Test" id="id_button" />
+        <p>
+          <textarea placeholder="... Output text ..." id="id_textarea" ></textarea>
+        </p>
+      </form>
+      <script>
+var aobj={
+  "set_init":function(param){
+    var athis = this;
+    this.m_param = param;
+    return;
+  },
+  "set_start":function(param){
+    var athis = this;
+    jQuery("#id_text").attr("placeholder","... Input text ...");
+    jQuery("#id_textarea").prop("readonly",true);
+    jQuery("#id_form").on("submit",async function(aevent){
+      aevent.preventDefault();
+  
+      const inputData = jQuery("#id_text").val();
+      // Replace with your actual model API endpoint URL
+//      const apiEndpoint = 'https://{{your-hf-account-name}}-{{your-backend-space-name}}.hf.space/api/predict';
+      const apiEndpoint = 'https://username-backendspace.hf.space/items/';
+      const atoken = jQuery("#id_accesstoken").val();
+
+      jQuery("#id_textarea").val('');
+  
+      try {
+          const response = await fetch(apiEndpoint, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  // If your model is private or requires auth, add a Hugging Face token here
+                  // 'Authorization': 'Bearer YOUR_HF_TOKEN' 
+              },
+              // The data format depends on your model's expected input (see "Use via API" docs)
+              body: JSON.stringify({ "data": [inputData], "accesstoken": atoken, }) 
+          });
+  
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+  
+          const result = await response.json();
+          // Process and display the result
+  //        resultDiv.textContent = 'Prediction: ' + JSON.stringify(result.data);
+        jQuery("#id_textarea").val('Prediction: ' + (result));
+  
+      } catch (error) {
+          console.error('Error fetching prediction:', error);
+  //        resultDiv.textContent = 'Error: ' + error.message;
+      }
+    });
+    return;
+  },
+  "m_param":null,
+};
+jQuery(document).ready(function(){
+  aobj.set_init({});
+  aobj.set_start({});
+  return;
+})
+      </script>
+	</body>
+</html>
